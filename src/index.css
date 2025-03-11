@@ -95,21 +95,22 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
+  /* Enhanced scrollbar styling */
   ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-transparent;
+    @apply bg-transparent rounded-full;
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-muted-foreground/30 rounded-full;
+    @apply bg-indigo-300 rounded-full hover:bg-indigo-400 transition-colors;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-muted-foreground/50;
+    @apply bg-indigo-400;
   }
 }
 
