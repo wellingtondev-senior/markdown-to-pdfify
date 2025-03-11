@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -61,7 +60,6 @@ const MarkdownConverter: React.FC = () => {
     setIsDownloading(true);
     
     try {
-      // Criar um novo documento PDF
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'px',
@@ -69,10 +67,9 @@ const MarkdownConverter: React.FC = () => {
         hotfixes: ['px_scaling'],
       });
       
-      const scale = 2; // Melhor qualidade
-      const padding = 40; // Padding nas bordas
+      const scale = 2;
+      const padding = 60;
       
-      // Capturar o conteúdo do preview como uma imagem
       const dataUrl = await htmlToImage.toPng(previewRef.current, {
         width: previewRef.current.scrollWidth * scale,
         height: previewRef.current.scrollHeight * scale,
@@ -81,45 +78,36 @@ const MarkdownConverter: React.FC = () => {
           transformOrigin: 'top left',
           width: `${previewRef.current.scrollWidth}px`,
           height: `${previewRef.current.scrollHeight}px`,
+          padding: `${padding}px`,
         },
         pixelRatio: 2
       });
       
-      // Calcular a largura e altura disponíveis na página
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
       const availableWidth = pageWidth - (padding * 2);
       
-      // Carregar a imagem
       const img = new Image();
       img.src = dataUrl;
       
       await new Promise<void>((resolve) => {
         img.onload = () => {
-          // Calcular o fator de escala para ajustar a largura
           const imgWidth = img.width / scale;
           const imgHeight = img.height / scale;
           const ratio = imgWidth / imgHeight;
           
-          // Ajustar à largura disponível
           const finalWidth = availableWidth;
           const finalHeight = finalWidth / ratio;
           
-          // Adicionar a imagem à primeira página
           let heightLeft = finalHeight;
           let position = 0;
           
-          // Adicionar a primeira parte da imagem
           pdf.addImage(dataUrl, 'PNG', padding, padding, finalWidth, finalHeight);
           heightLeft -= (pageHeight - (padding * 2));
           position = 1;
           
-          // Se a altura da imagem for maior que a altura da página, criar novas páginas
           while (heightLeft > 0) {
-            // Adicionar nova página
             pdf.addPage();
-            
-            // Adicionar a parte seguinte da imagem
             pdf.addImage(
               dataUrl, 
               'PNG', 
@@ -128,12 +116,10 @@ const MarkdownConverter: React.FC = () => {
               finalWidth, 
               finalHeight
             );
-            
             heightLeft -= (pageHeight - (padding * 2));
             position++;
           }
           
-          // Salvar o PDF
           pdf.save('mdpdf-download.pdf');
           
           toast({
@@ -157,30 +143,28 @@ const MarkdownConverter: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen bg-gradient-to-br from-purple-50 to-indigo-50">
       <Header onDownload={handleDownload} isDownloading={isDownloading} />
       
       <main className="flex-1 overflow-hidden">
         <div className="container h-full px-4 py-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Editor */}
           <div className="flex flex-col h-full">
-            <div className="mb-2 text-sm font-medium text-muted-foreground">Editor Markdown</div>
-            <div className="relative flex-1 overflow-hidden rounded-lg border bg-background shadow-sm transition-all">
+            <div className="mb-2 text-sm font-medium text-indigo-600">Editor Markdown</div>
+            <div className="relative flex-1 overflow-hidden rounded-lg border border-indigo-100 bg-white shadow-lg transition-all">
               <textarea
                 value={markdown}
                 onChange={handleTextChange}
-                className="absolute inset-0 resize-none p-4 font-mono text-sm bg-transparent outline-none"
+                className="absolute inset-0 resize-none p-6 font-mono text-sm bg-transparent outline-none scrollbar-thin scrollbar-thumb-indigo-200 scrollbar-track-transparent hover:scrollbar-thumb-indigo-300"
                 placeholder="Digite seu markdown aqui..."
                 disabled={isDownloading}
               />
             </div>
           </div>
           
-          {/* Preview */}
           <div className="flex flex-col h-full">
-            <div className="mb-2 text-sm font-medium text-muted-foreground">Pré-visualização</div>
+            <div className="mb-2 text-sm font-medium text-indigo-600">Pré-visualização</div>
             <div 
-              className="flex-1 overflow-auto rounded-lg border bg-white p-6 shadow-sm transition-all"
+              className="flex-1 overflow-auto rounded-lg border border-indigo-100 bg-white p-8 shadow-lg transition-all scrollbar-thin scrollbar-thumb-indigo-200 scrollbar-track-transparent hover:scrollbar-thumb-indigo-300"
             >
               <div 
                 ref={previewRef}
@@ -189,12 +173,16 @@ const MarkdownConverter: React.FC = () => {
                 <ReactMarkdown 
                   remarkPlugins={[remarkGfm]}
                   components={{
-                    // Apply the prose classes to the root div instead of directly on ReactMarkdown
-                    root: ({ children }) => (
-                      <div className="prose prose-sm md:prose-base lg:prose-lg max-w-none">
-                        {children}
-                      </div>
-                    )
+                    p: ({node, ...props}) => <p className="mb-4" {...props} />,
+                    h1: ({node, ...props}) => <h1 className="mb-6 text-indigo-900" {...props} />,
+                    h2: ({node, ...props}) => <h2 className="mb-5 text-indigo-800" {...props} />,
+                    h3: ({node, ...props}) => <h3 className="mb-4 text-indigo-700" {...props} />,
+                    ul: ({node, ...props}) => <ul className="mb-4 space-y-2" {...props} />,
+                    ol: ({node, ...props}) => <ol className="mb-4 space-y-2" {...props} />,
+                    li: ({node, ...props}) => <li className="ml-4" {...props} />,
+                    table: ({node, ...props}) => <table className="mb-4 w-full border-collapse" {...props} />,
+                    td: ({node, ...props}) => <td className="border border-indigo-200 p-2" {...props} />,
+                    th: ({node, ...props}) => <th className="border border-indigo-300 bg-indigo-50 p-2" {...props} />,
                   }}
                 >
                   {markdown}
