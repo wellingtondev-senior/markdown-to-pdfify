@@ -187,8 +187,15 @@ const MarkdownConverter: React.FC = () => {
                 className="markdown-preview"
               >
                 <ReactMarkdown 
-                  remarkPlugins={[remarkGfm]} 
-                  className="prose prose-sm md:prose-base lg:prose-lg max-w-none"
+                  remarkPlugins={[remarkGfm]}
+                  components={{
+                    // Apply the prose classes to the root div instead of directly on ReactMarkdown
+                    root: ({ children }) => (
+                      <div className="prose prose-sm md:prose-base lg:prose-lg max-w-none">
+                        {children}
+                      </div>
+                    )
+                  }}
                 >
                   {markdown}
                 </ReactMarkdown>
