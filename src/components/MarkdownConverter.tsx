@@ -155,7 +155,7 @@ const MarkdownConverter: React.FC = () => {
               <textarea
                 value={markdown}
                 onChange={handleTextChange}
-                className="absolute inset-0 resize-none p-6 font-mono text-sm bg-transparent outline-none scrollbar-thin scrollbar-thumb-indigo-300 scrollbar-track-transparent hover:scrollbar-thumb-indigo-400"
+                className="absolute inset-0 resize-none p-6 font-mono text-sm bg-transparent outline-none overflow-y-auto"
                 placeholder="Digite seu markdown aqui..."
                 disabled={isDownloading}
               />
@@ -165,7 +165,7 @@ const MarkdownConverter: React.FC = () => {
           <div className="flex flex-col h-full">
             <div className="mb-2 text-sm font-medium text-indigo-600">Pré-visualização</div>
             <div 
-              className="flex-1 overflow-auto rounded-lg border border-indigo-100 bg-white p-8 shadow-lg transition-all scrollbar-thin scrollbar-thumb-indigo-300 scrollbar-track-transparent hover:scrollbar-thumb-indigo-400"
+              className="flex-1 overflow-y-auto rounded-lg border border-indigo-100 bg-white p-8 shadow-lg transition-all"
             >
               <div 
                 ref={previewRef}
